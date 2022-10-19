@@ -13,20 +13,20 @@ import (
 func TestInitialize(t *testing.T) {
 	qList := []RabbitQueue{
 		RabbitQueue{
-			name: "SMS",
+			Name: "SMS",
 		},
 		RabbitQueue{
-			name: "EMAIL",
+			Name: "EMAIL",
 		},
 	}
 	rabbit, err := InitializeRabbit("amqp://user:bitnami@localhost:5672/",
-		RabbitExchange{name: "eslami", exchangeType: "fanout"},
+		RabbitExchange{Name: "eslami", ExchangeType: "fanout"},
 		qList)
 
 	if err != nil {
 		t.Errorf("rabbit initialize failed")
 	}
-	rabbit.exchange = &RabbitExchange{name: "eslami", exchangeType: "fanout"}
+	rabbit.Exchange = &RabbitExchange{Name: "eslami", ExchangeType: "fanout"}
 	err = CreateExchange(rabbit)
 	if err != nil {
 		t.Errorf("Create exchange failed")
@@ -41,14 +41,14 @@ func TestInitialize(t *testing.T) {
 func TestSend(t *testing.T) {
 	qList := []RabbitQueue{
 		RabbitQueue{
-			name: "SMS",
+			Name: "SMS",
 		},
 		RabbitQueue{
-			name: "EMAIL",
+			Name: "EMAIL",
 		},
 	}
 	rabbit, err := InitializeRabbit("amqp://user:bitnami@localhost:5672/",
-		RabbitExchange{name: "eslami", exchangeType: "fanout"},
+		RabbitExchange{Name: "eslami", ExchangeType: "fanout"},
 		qList)
 
 	if err != nil {
@@ -71,14 +71,14 @@ func receiveFunction(data []byte) {
 func TestReceive(t *testing.T) {
 	qList := []RabbitQueue{
 		RabbitQueue{
-			name: "SMS",
+			Name: "SMS",
 		},
 		RabbitQueue{
-			name: "EMAIL",
+			Name: "EMAIL",
 		},
 	}
 	rabbit, err := InitializeRabbit("amqp://user:bitnami@localhost:5672/",
-		RabbitExchange{name: "eslami", exchangeType: "fanout"},
+		RabbitExchange{Name: "eslami", ExchangeType: "fanout"},
 		qList)
 
 	if err != nil {

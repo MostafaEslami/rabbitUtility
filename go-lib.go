@@ -14,48 +14,48 @@ import (
 )
 
 type RabbitRep struct {
-	connection    *amqp091.Connection
-	exchange      *RabbitExchange
-	channel       *amqp091.Channel
-	queueInstance []amqp091.Queue
+	Connection    *amqp091.Connection
+	Exchange      *RabbitExchange
+	Channel       *amqp091.Channel
+	QueueInstance []amqp091.Queue
 }
 
 type RabbitQueue struct {
-	name           string
-	durable        bool          `default:"false"`
-	deleteWhenUsed bool          `default:"false"`
-	exclusive      bool          `default:"false"`
-	noWait         bool          `default:"false"`
-	args           amqp091.Table `default:"nil"`
+	Name           string
+	Durable        bool          `default:"false"`
+	DeleteWhenUsed bool          `default:"false"`
+	Exclusive      bool          `default:"false"`
+	NoWait         bool          `default:"false"`
+	Args           amqp091.Table `default:"nil"`
 }
 type RabbitExchange struct {
-	name         string
-	exchangeType string        `default:"direct"`
-	durable      bool          `default:"false"`
-	autoDelete   bool          `default:"false"`
-	internal     bool          `default:"false"`
-	noWait       bool          `default:"false"`
-	args         amqp091.Table `default:"nil"`
+	Name         string
+	ExchangeType string        `default:"direct"`
+	Durable      bool          `default:"false"`
+	AutoDelete   bool          `default:"false"`
+	Internal     bool          `default:"false"`
+	NoWait       bool          `default:"false"`
+	Args         amqp091.Table `default:"nil"`
 }
 
 type fn func([]byte)
 
 func CreateExchange(rabbit *RabbitRep) error {
-	fmt.Printf("\n\nimostafa : %+v\n", rabbit.exchange)
-	err := rabbit.channel.ExchangeDeclare(rabbit.exchange.name,
-		rabbit.exchange.exchangeType,
-		rabbit.exchange.durable,
-		rabbit.exchange.autoDelete,
-		rabbit.exchange.internal,
-		rabbit.exchange.noWait, nil)
+	// fmt.Printf("\n\nimostafa : %+v\n", rabbit.Exchange)
+	err := rabbit.Channel.ExchangeDeclare(rabbit.Exchange.Name,
+		rabbit.Exchange.ExchangeType,
+		rabbit.Exchange.Durable,
+		rabbit.Exchange.AutoDelete,
+		rabbit.Exchange.Internal,
+		rabbit.Exchange.NoWait, nil)
 	return err
 }
 
 func BoundQueueToExchange(rabbit *RabbitRep, routingKey string) error {
-	for _, q := range rabbit.queueInstance {
-		err := rabbit.channel.QueueBind(q.Name,
+	for _, q := range rabbit.QueueInstance {
+		err := rabbit.Channel.QueueBind(q.Name,
 			routingKey,
-			rabbit.exchange.name,
+			rabbit.Exchange.Name,
 			false, nil)
 		if err != nil {
 			return err
@@ -78,15 +78,15 @@ func InitializeRabbit(uri string, exchange RabbitExchange, queues []RabbitQueue)
 
 	var qList []amqp091.Queue
 	for _, q := range queues {
-		fmt.Printf("\n\n\t\tqData : %+v\n", q)
-		queue, err := ch.QueueDeclare(q.name, q.durable, q.deleteWhenUsed, q.exclusive, q.noWait, nil)
+		// fmt.Printf("\n\n\t\tqData : %+v\n", q)
+		queue, err := ch.QueueDeclare(q.Name, q.Durable, q.DeleteWhenUsed, q.Exclusive, q.NoWait, nil)
 		if err != nil {
 			fmt.Printf("err: %v\n", err)
 			return nil, err
 		}
 		qList = append(qList, queue)
 	}
-	return &RabbitRep{exchange: &exchange, connection: conn, channel: ch, queueInstance: qList}, nil
+	return &RabbitRep{Exchange: &exchange, Connection: conn, Channel: ch, QueueInstance: qList}, nil
 }
 
 func Send(rabbit *RabbitRep, data string, ct string) error {
@@ -95,8 +95,8 @@ func Send(rabbit *RabbitRep, data string, ct string) error {
 
 	// fmt.Printf("\n\n\t\teslami : %+v\n", rabbit)
 
-	err := rabbit.channel.PublishWithContext(ctx,
-		rabbit.exchange.name,
+	err := rabbit.Channel.PublishWithContext(ctx,
+		rabbit.Exchange.Name,
 		"",
 		false,
 		false,
@@ -112,7 +112,7 @@ func Send(rabbit *RabbitRep, data string, ct string) error {
 }
 
 func Receive(rabbit *RabbitRep, queueName string, function fn) {
-	msgs, _ := rabbit.channel.Consume(
+	msgs, _ := rabbit.Channel.Consume(
 		queueName,
 		"",
 		true,
