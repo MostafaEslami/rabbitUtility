@@ -1,4 +1,4 @@
-module github.com/mostafeslami/rabbitUtility
+module github.com/mostafaeslami/rabbitUtility
 
 go 1.18
 
