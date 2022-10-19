@@ -38,7 +38,7 @@ type RabbitExchange struct {
 	Args         amqp091.Table `default:"nil"`
 }
 
-type fn func([]byte)
+type RabbitFunction func([]byte)
 
 func CreateExchange(rabbit *RabbitRep) error {
 	// fmt.Printf("\n\nimostafa : %+v\n", rabbit.Exchange)
@@ -111,7 +111,7 @@ func Send(rabbit *RabbitRep, data string, ct string) error {
 	return nil
 }
 
-func Receive(rabbit *RabbitRep, queueName string, function fn) {
+func Receive(rabbit *RabbitRep, queueName string, function RabbitFunction) {
 	msgs, _ := rabbit.Channel.Consume(
 		queueName,
 		"",
